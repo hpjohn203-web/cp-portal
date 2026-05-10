@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FLASHCARDS as questions } from '../data/flashcards.js';
 import { useProgress } from '../hooks/useProgress';
+import ReviewNudge, { checkAndIncrementNudge } from './ReviewNudge';
 
 const TOPICS = ['All', ...Array.from(new Set(questions.map(q => q.topic))).sort()];
 const SWIPE_THRESHOLD = 60;
@@ -44,10 +45,17 @@ export default function StudyMode({ onNavigate }) {
   const cardRef = useRef(null);
   const showResultRef = useRef(null);
   const deckRef = useRef([]);
+  const nudgedRef = useRef(false);
+  const [showNudge, setShowNudge] = useState(false);
 
   useEffect(() => { cardRef.current = deck[cardIndex]; }, [deck, cardIndex]);
   useEffect(() => { showResultRef.current = showResult; }, [showResult]);
   useEffect(() => { deckRef.current = deck; }, [deck]);
+  useEffect(() => {
+    if (!sessionStarted || deck.length === 0 || cardIndex < deck.length || nudgedRef.current) return;
+    nudgedRef.current = true;
+    if (checkAndIncrementNudge()) setShowNudge(true);
+  }, [sessionStarted, deck, cardIndex]);
 
   // Preview count for setup screen
   function getPool() {
@@ -69,6 +77,7 @@ export default function StudyMode({ onNavigate }) {
     setShowResult(null);
     setSessionCorrect(0);
     setSessionTotal(0);
+    nudgedRef.current = false;
     setSessionStarted(true);
   }
 
@@ -281,16 +290,19 @@ export default function StudyMode({ onNavigate }) {
   // ── DECK COMPLETE ──
   if (!card) {
     return (
-      <div className="px-4 py-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
-        <p className="text-4xl mb-3">🎉</p>
-        <p className="text-xl font-bold mb-2">Deck complete!</p>
-        <p className="text-slate-400 text-sm text-center mb-1">Session score: <span className="text-amber-400 font-semibold">{sessionCorrect}/{sessionTotal}</span></p>
-        <p className="text-slate-500 text-xs mb-6">({sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0}% accuracy)</p>
-        <div className="flex gap-3">
-          <button onClick={() => setSessionStarted(false)} className="bg-slate-700 text-slate-200 font-semibold px-5 py-3 rounded-2xl">Change Settings</button>
-          <button onClick={startSession} className="bg-amber-500 text-slate-900 font-bold px-5 py-3 rounded-2xl">Restart</button>
+      <>
+        {showNudge && <ReviewNudge onClose={() => setShowNudge(false)} />}
+        <div className="px-4 py-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
+          <p className="text-4xl mb-3">🎉</p>
+          <p className="text-xl font-bold mb-2">Deck complete!</p>
+          <p className="text-slate-400 text-sm text-center mb-1">Session score: <span className="text-amber-400 font-semibold">{sessionCorrect}/{sessionTotal}</span></p>
+          <p className="text-slate-500 text-xs mb-6">({sessionTotal > 0 ? Math.round((sessionCorrect / sessionTotal) * 100) : 0}% accuracy)</p>
+          <div className="flex gap-3">
+            <button onClick={() => setSessionStarted(false)} className="bg-slate-700 text-slate-200 font-semibold px-5 py-3 rounded-2xl">Change Settings</button>
+            <button onClick={startSession} className="bg-amber-500 text-slate-900 font-bold px-5 py-3 rounded-2xl">Restart</button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

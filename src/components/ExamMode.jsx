@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import questions from '../data/questions.json';
 import { useProgress } from '../hooks/useProgress';
+import ReviewNudge, { checkAndIncrementNudge } from './ReviewNudge';
 
 const EXAM_Q = 120;
 const EXAM_MINS = 150;
@@ -16,6 +17,7 @@ export default function ExamMode({ onNavigate }) {
   const [flagged, setFlagged] = useState(new Set());
   const [timeLeft, setTimeLeft] = useState(EXAM_SECS);
   const [reviewData, setReviewData] = useState([]);
+  const [showNudge, setShowNudge] = useState(false);
 
   const quizRef = useRef([]);
   const selectedRef = useRef({});
@@ -67,6 +69,7 @@ export default function ExamMode({ onNavigate }) {
     saveSession(score, quizData.length, EXAM_NAME, questionResults);
     setReviewData(results);
     setPhase('review');
+    if (checkAndIncrementNudge()) setShowNudge(true);
   }
 
   function handleSubmit() {
@@ -99,14 +102,17 @@ export default function ExamMode({ onNavigate }) {
 
   if (phase === 'review') {
     return (
-      <ExamReviewScreen
-        quiz={quiz}
-        reviewData={reviewData}
-        onRetry={startExam}
-        onHome={() => onNavigate('home')}
-        onResults={() => onNavigate('results')}
-        onErrorLog={() => onNavigate('errorlog')}
-      />
+      <>
+        {showNudge && <ReviewNudge onClose={() => setShowNudge(false)} />}
+        <ExamReviewScreen
+          quiz={quiz}
+          reviewData={reviewData}
+          onRetry={startExam}
+          onHome={() => onNavigate('home')}
+          onResults={() => onNavigate('results')}
+          onErrorLog={() => onNavigate('errorlog')}
+        />
+      </>
     );
   }
 
