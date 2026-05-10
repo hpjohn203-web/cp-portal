@@ -20,6 +20,7 @@ export default function ExamMode({ onNavigate }) {
   const quizRef = useRef([]);
   const selectedRef = useRef({});
   const timerRef = useRef(null);
+  const gridRef = useRef(null);
 
   useEffect(() => { quizRef.current = quiz; }, [quiz]);
   useEffect(() => { selectedRef.current = selectedAnswers; }, [selectedAnswers]);
@@ -138,7 +139,8 @@ export default function ExamMode({ onNavigate }) {
 
       {/* Question navigator */}
       <div className="px-4 py-2 border-b border-slate-800/60 bg-slate-900/30">
-        <div className="flex gap-1 flex-wrap max-h-[72px] overflow-y-auto scrollbar-hide">
+        <div className="flex gap-2 items-start">
+          <div ref={gridRef} className="flex-1 flex gap-1 flex-wrap max-h-[72px] overflow-y-auto scrollbar-hide">
           {quiz.map((_, i) => (
             <button
               key={i}
@@ -156,6 +158,18 @@ export default function ExamMode({ onNavigate }) {
               {i + 1}
             </button>
           ))}
+          </div>
+          {/* Desktop scroll arrows */}
+          <div className="hidden lg:flex flex-col justify-between h-[72px] shrink-0 pl-1">
+            <button
+              onClick={() => gridRef.current?.scrollBy({ top: -36, behavior: 'smooth' })}
+              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-500 hover:text-slate-200 transition-colors text-[10px] leading-none border border-slate-700/50"
+            >▲</button>
+            <button
+              onClick={() => gridRef.current?.scrollBy({ top: 36, behavior: 'smooth' })}
+              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-500 hover:text-slate-200 transition-colors text-[10px] leading-none border border-slate-700/50"
+            >▼</button>
+          </div>
         </div>
         <div className="flex gap-3 mt-1.5 text-xs text-slate-500">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500/25 inline-block" /> Answered</span>
@@ -201,7 +215,7 @@ export default function ExamMode({ onNavigate }) {
       </div>
 
       {/* Prev / Next navigation */}
-      <div className="px-4 pb-6 pt-3 border-t border-slate-800 flex gap-3">
+      <div className="px-4 pb-2 pt-3 border-t border-slate-800 flex gap-3">
         <button
           onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
           disabled={currentIndex === 0}
@@ -238,8 +252,8 @@ function AdvisoryScreen({ onStart, onBack }) {
         </p>
         <div className="w-full max-w-sm space-y-3 mb-8">
           {[
-            { icon: '📋', label: '120 Questions', desc: 'Randomly drawn from all domains' },
-            { icon: '⏱️', label: '120 Minutes', desc: 'Total countdown — auto-submits on expiry' },
+            { icon: '📋', label: `${EXAM_Q} Questions`, desc: 'Randomly drawn from all domains' },
+            { icon: '⏱️', label: `${EXAM_MINS} Minutes`, desc: 'Total countdown — auto-submits on expiry' },
             { icon: '🔀', label: 'Free Navigation', desc: 'Jump between questions, change answers anytime' },
             { icon: '🚩', label: 'Flag Questions', desc: 'Mark uncertain answers to revisit before submit' },
             { icon: '✅', label: 'Full Review at End', desc: 'All answers + explanations revealed after submit' },
