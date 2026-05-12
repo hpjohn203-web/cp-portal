@@ -1,4 +1,4 @@
-const AMAZON_URL = 'https://www.amazon.com';
+const AMAZON_URL = 'https://www.amazon.com/dp/B0H1BTG9H4';
 const NUDGE_KEY = 'cp_review_nudge';
 
 function getNudgeState() {
@@ -65,10 +65,9 @@ export default function ReviewNudge({ onClose }) {
       >
         <div className="text-center mb-5">
           <div className="text-4xl mb-3">🏆</div>
-          <h3 className="text-lg font-bold text-slate-100 mb-2">You just finished a session!</h3>
+          <h3 className="text-lg font-bold text-slate-100 mb-2">Quick favour?</h3>
           <p className="text-sm text-slate-400 leading-relaxed">
-            If the book got you here, 2 minutes on Amazon means everything to a small publisher.
-            Your review helps other candidates find the right resource.
+            If this has been useful, an Amazon review goes a long way for our brand and helps other candidates find this resource.
           </p>
         </div>
 

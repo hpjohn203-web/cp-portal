@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const FORMSPREE_ID = 'mzdogjjv';
 const PORTAL_PREFIX = '[Certified Paralegal - ApexCert]';
-const AMAZON_URL = 'https://www.amazon.com';
+const AMAZON_URL = 'https://www.amazon.com/dp/B0H1BTG9H4';
 
 export default function Contact({ onNavigate }) {
   const [name, setName] = useState('');

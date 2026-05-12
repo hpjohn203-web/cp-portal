@@ -119,9 +119,10 @@ export default function ExamMode({ onNavigate }) {
   const currentQ = quiz[currentIndex];
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex flex-col max-w-3xl mx-auto">
-      {/* Header: progress + timer */}
-      <div className="px-4 py-3 border-b border-slate-800 bg-slate-950/50">
+    <div className="flex flex-col min-h-[calc(100vh-3.5rem)]">
+
+      {/* Header: timer + submit */}
+      <div className="px-4 lg:px-6 py-3 border-b border-slate-800 bg-slate-950/50 shrink-0">
         <div className="flex items-center justify-between mb-2">
           <div>
             <p className="text-xs text-slate-500">Full Exam · Q{currentIndex + 1}/{quiz.length}</p>
@@ -131,10 +132,8 @@ export default function ExamMode({ onNavigate }) {
             <p className={`text-2xl font-mono font-bold ${timerColor}`}>{mins}:{secs}</p>
             <p className="text-xs text-slate-500">remaining</p>
           </div>
-          <button
-            onClick={handleSubmit}
-            className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs px-3 py-2 rounded-xl transition-colors active:scale-95"
-          >
+          <button onClick={handleSubmit}
+            className="bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs px-3 py-2 rounded-xl transition-colors active:scale-95">
             Submit
           </button>
         </div>
@@ -144,98 +143,79 @@ export default function ExamMode({ onNavigate }) {
       </div>
 
       {/* Question navigator */}
-      <div className="px-4 py-2 border-b border-slate-800/60 bg-slate-900/30">
+      <div className="px-4 py-2 border-b border-slate-800/60 bg-slate-900/30 shrink-0">
         <div className="flex gap-2 items-start">
-          <div ref={gridRef} className="flex-1 flex gap-1 flex-wrap max-h-[72px] overflow-y-auto scrollbar-hide">
-          {quiz.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={`w-7 h-7 text-xs rounded-lg font-semibold transition-colors shrink-0 ${
-                i === currentIndex
-                  ? 'bg-amber-500 text-slate-900'
+          <div ref={gridRef} className="flex gap-1 flex-wrap max-h-[72px] overflow-y-auto scrollbar-hide flex-1">
+            {quiz.map((_, i) => (
+              <button key={i} onClick={() => setCurrentIndex(i)}
+                className={`w-7 h-7 text-xs rounded-lg font-semibold transition-colors shrink-0 ${
+                  i === currentIndex ? 'bg-amber-500 text-slate-900'
                   : selectedAnswers[i] !== undefined
                   ? flagged.has(i) ? 'bg-amber-400/30 text-amber-300 ring-1 ring-amber-400/50' : 'bg-emerald-500/25 text-emerald-300'
-                  : flagged.has(i)
-                  ? 'bg-amber-500/20 text-amber-400'
+                  : flagged.has(i) ? 'bg-amber-500/20 text-amber-400'
                   : 'bg-slate-800 text-slate-400'
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
+                }`}>{i + 1}
+              </button>
+            ))}
           </div>
-          {/* Desktop scroll arrows */}
           <div className="hidden lg:flex flex-col justify-between h-[72px] shrink-0 pl-1">
-            <button
-              onClick={() => gridRef.current?.scrollBy({ top: -36, behavior: 'smooth' })}
-              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-500 hover:text-slate-200 transition-colors text-[10px] leading-none border border-slate-700/50"
-            >▲</button>
-            <button
-              onClick={() => gridRef.current?.scrollBy({ top: 36, behavior: 'smooth' })}
-              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-500 hover:text-slate-200 transition-colors text-[10px] leading-none border border-slate-700/50"
-            >▼</button>
+            <button onClick={() => gridRef.current?.scrollBy({ top: -36, behavior: 'smooth' })}
+              className="text-slate-500 hover:text-slate-300 text-xs leading-none">▲</button>
+            <button onClick={() => gridRef.current?.scrollBy({ top: 36, behavior: 'smooth' })}
+              className="text-slate-500 hover:text-slate-300 text-xs leading-none">▼</button>
           </div>
         </div>
         <div className="flex gap-3 mt-1.5 text-xs text-slate-500">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500/25 inline-block" /> Answered</span>
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500/20 inline-block" /> Flagged</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-slate-800 inline-block" /> Unanswered</span>
         </div>
       </div>
 
       {/* Question body */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs text-amber-400 font-semibold uppercase tracking-wider">{currentQ.topic}</span>
-          <button
-            onClick={() => toggleFlag(currentIndex)}
-            className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${flagged.has(currentIndex) ? 'bg-amber-500/20 text-amber-400' : 'text-slate-600 hover:text-slate-400'}`}
-          >
-            {flagged.has(currentIndex) ? '🚩 Flagged' : '⚑ Flag'}
-          </button>
-        </div>
-        <p className="text-sm leading-relaxed mb-5 mt-1">{currentQ.question}</p>
-        <div className="space-y-3">
-          {currentQ.options.map((opt, i) => {
-            const letter = 'ABCD'[i];
-            const isSelected = selectedAnswers[currentIndex] === letter;
-            return (
-              <button
-                key={letter}
-                onClick={() => setSelectedAnswers(prev => ({ ...prev, [currentIndex]: letter }))}
-                className={`w-full text-left rounded-2xl px-4 py-3.5 transition-all active:scale-[0.98] ${
-                  isSelected
-                    ? 'bg-amber-500/20 border border-amber-500 text-amber-100'
+      <div className="flex-1 overflow-y-auto px-4 lg:px-8 py-4 lg:py-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-amber-400 font-semibold uppercase tracking-wider">{currentQ.topic}</span>
+            <button onClick={() => toggleFlag(currentIndex)}
+              className={`text-xs px-2.5 py-1 rounded-lg transition-colors ${flagged.has(currentIndex) ? 'bg-amber-500/20 text-amber-400' : 'text-slate-600 hover:text-slate-400'}`}>
+              {flagged.has(currentIndex) ? '🚩 Flagged' : '⚑ Flag'}
+            </button>
+          </div>
+          <p className="text-sm lg:text-base leading-relaxed mb-5 mt-1">{currentQ.question}</p>
+          <div className="space-y-3">
+            {currentQ.options.map((opt, i) => {
+              const letter = 'ABCD'[i];
+              const isSelected = selectedAnswers[currentIndex] === letter;
+              return (
+                <button key={letter}
+                  onClick={() => setSelectedAnswers(prev => ({ ...prev, [currentIndex]: letter }))}
+                  className={`w-full text-left rounded-2xl px-4 py-3.5 transition-all active:scale-[0.98] ${
+                    isSelected ? 'bg-amber-500/20 border border-amber-500 text-amber-100'
                     : 'bg-slate-800 border border-slate-700 text-slate-200 hover:border-slate-600'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <span className={`font-bold text-sm shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs ${isSelected ? 'bg-amber-500 text-slate-900' : 'bg-slate-700 text-slate-300'}`}>{letter}</span>
-                  <span className="text-sm leading-relaxed">{opt}</span>
-                </div>
-              </button>
-            );
-          })}
+                  }`}>
+                  <div className="flex items-start gap-3">
+                    <span className={`font-bold text-sm shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs ${isSelected ? 'bg-amber-500 text-slate-900' : 'bg-slate-700 text-slate-300'}`}>{letter}</span>
+                    <span className="text-sm lg:text-base leading-relaxed">{opt}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Prev / Next navigation */}
-      <div className="px-4 pb-2 pt-3 border-t border-slate-800 flex gap-3">
-        <button
-          onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-          disabled={currentIndex === 0}
-          className="flex-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-200 font-semibold py-3 rounded-2xl transition-colors active:scale-95"
-        >
-          ← Previous
-        </button>
-        <button
-          onClick={() => setCurrentIndex(i => Math.min(quiz.length - 1, i + 1))}
-          disabled={currentIndex === quiz.length - 1}
-          className="flex-1 bg-amber-500 hover:bg-amber-400 disabled:opacity-30 text-slate-900 font-bold py-3 rounded-2xl transition-colors active:scale-95"
-        >
-          Next →
-        </button>
+      {/* Prev / Next */}
+      <div className="px-4 lg:px-8 pb-3 pt-3 border-t border-slate-800 shrink-0">
+        <div className="max-w-3xl mx-auto flex gap-3">
+          <button onClick={() => setCurrentIndex(i => Math.max(0, i - 1))} disabled={currentIndex === 0}
+            className="flex-1 bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-200 font-semibold py-3 rounded-2xl transition-colors active:scale-95">
+            ← Previous
+          </button>
+          <button onClick={() => setCurrentIndex(i => Math.min(quiz.length - 1, i + 1))} disabled={currentIndex === quiz.length - 1}
+            className="flex-1 bg-amber-500 hover:bg-amber-400 disabled:opacity-30 text-slate-900 font-bold py-3 rounded-2xl transition-colors active:scale-95">
+            Next →
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -243,43 +223,59 @@ export default function ExamMode({ onNavigate }) {
 
 function AdvisoryScreen({ onStart, onBack }) {
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex flex-col max-w-2xl mx-auto">
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800">
+    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex flex-col">
+      <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800 shrink-0">
         <button onClick={onBack} className="text-slate-400 hover:text-slate-200 p-1">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
         </button>
         <h1 className="text-lg font-bold">Full Exam Simulation</h1>
       </div>
-      <div className="flex-1 px-4 py-8 flex flex-col items-center justify-center">
-        <div className="text-6xl mb-4 text-center">📝</div>
-        <h2 className="text-2xl font-bold mb-2 text-center">Certified Paralegal (CP) Exam</h2>
-        <p className="text-slate-400 text-sm leading-relaxed text-center max-w-sm mb-8">
-          Simulate real exam conditions. Read the details below, find a quiet space, and allow the full time.
-        </p>
-        <div className="w-full max-w-sm space-y-3 mb-8">
-          {[
-            { icon: '📋', label: `${EXAM_Q} Questions`, desc: 'Randomly drawn from all domains' },
-            { icon: '⏱️', label: `${EXAM_MINS} Minutes`, desc: 'Total countdown — auto-submits on expiry' },
-            { icon: '🔀', label: 'Free Navigation', desc: 'Jump between questions, change answers anytime' },
-            { icon: '🚩', label: 'Flag Questions', desc: 'Mark uncertain answers to revisit before submit' },
-            { icon: '✅', label: 'Full Review at End', desc: 'All answers + explanations revealed after submit' },
-          ].map(item => (
-            <div key={item.label} className="flex items-start gap-3 bg-slate-800 rounded-2xl px-4 py-3">
-              <span className="text-xl shrink-0">{item.icon}</span>
-              <div>
-                <p className="text-sm font-semibold">{item.label}</p>
-                <p className="text-xs text-slate-400">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+
+      <div className="flex-1 flex flex-col lg:flex-row">
+
+        {/* Left: intro + readiness tip */}
+        <div className="lg:flex-1 px-6 lg:px-12 py-8 flex flex-col justify-center items-center lg:items-start lg:border-r lg:border-slate-800">
+          <div className="text-6xl mb-4">📝</div>
+          <h2 className="text-2xl font-bold mb-2 text-center lg:text-left">{EXAM_NAME}</h2>
+          <p className="text-slate-400 text-sm leading-relaxed text-center lg:text-left max-w-sm mb-6">
+            Simulate real exam conditions. Find a quiet space and allow the full time.
+          </p>
+          <div className="w-full max-w-sm bg-violet-500/10 border border-violet-500/30 rounded-2xl px-4 py-3 flex items-start gap-3">
+            <span className="text-xl shrink-0">💡</span>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              <strong className="text-violet-300">Readiness tip:</strong> We recommend attempting this simulation only after you have studied the exam prep book thoroughly and feel confident across all domains. Use the flashcards, quiz mode, and glossary to reinforce your reading — then treat this full exam as your final check before the real thing.
+            </p>
+          </div>
         </div>
-        <p className="text-xs text-slate-500 mb-6 text-center">Passing score on the real exam is 70%.</p>
-        <button
-          onClick={onStart}
-          className="w-full max-w-sm bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-4 rounded-2xl transition-colors active:scale-95 text-lg"
-        >
-          Begin Exam →
-        </button>
+
+        {/* Right: exam details + begin */}
+        <div className="lg:w-96 xl:w-[440px] px-6 lg:px-10 py-8 flex flex-col justify-center">
+          <div className="space-y-3 mb-6">
+            {[
+              { icon: '📋', label: `${EXAM_Q} Questions`, desc: 'Randomly drawn from all domains' },
+              { icon: '⏱️', label: `${EXAM_MINS} Minutes`, desc: 'Total countdown — auto-submits on expiry' },
+              { icon: '🔀', label: 'Free Navigation', desc: 'Jump between questions, change answers anytime' },
+              { icon: '🚩', label: 'Flag Questions', desc: 'Mark uncertain answers to revisit before submit' },
+              { icon: '✅', label: 'Full Review at End', desc: 'All answers + explanations revealed after submit' },
+            ].map(item => (
+              <div key={item.label} className="flex items-start gap-3 bg-slate-800 rounded-2xl px-4 py-3">
+                <span className="text-xl shrink-0">{item.icon}</span>
+                <div>
+                  <p className="text-sm font-semibold">{item.label}</p>
+                  <p className="text-xs text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500 mb-4 text-center">Passing score on the real exam is 70%.</p>
+          <button
+            onClick={onStart}
+            className="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-4 rounded-2xl transition-colors active:scale-95 text-lg"
+          >
+            Begin Exam →
+          </button>
+        </div>
+
       </div>
     </div>
   );

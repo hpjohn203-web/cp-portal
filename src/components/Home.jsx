@@ -154,7 +154,7 @@ export default function Home({ onNavigate }) {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowWelcome(true)} className="text-xs text-slate-500 hover:text-slate-300 border border-slate-700 hover:border-slate-600 px-2.5 py-1.5 rounded-lg transition-colors">? Help</button>
-          <span className="text-sm text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full">{TOTAL_CONTENT.toLocaleString()} Questions</span>
+          <span className="text-sm text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full">{FLASHCARDS.length.toLocaleString()} Flashcards · {questions.length} Exam Qs</span>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export default function Home({ onNavigate }) {
       <div className="lg:hidden mb-5">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-2xl font-bold text-amber-400">Certified Paralegal</h1>
-          <span className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-full">{TOTAL_CONTENT.toLocaleString()} Qs</span>
+          <span className="text-xs text-slate-400 bg-slate-800 px-2 py-1 rounded-full">{FLASHCARDS.length.toLocaleString()} Cards · {questions.length} Qs</span>
         </div>
         <p className="text-slate-400 text-sm">CP Exam Prep Portal · ApexCert Publications</p>
       </div>
